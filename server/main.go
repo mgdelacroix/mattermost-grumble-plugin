@@ -11,7 +11,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	grumbleServer.Set("NoWebServer", "true")
+	grumbleServer.Set("NoWebServer", "false") // ToDo: required?
+	grumbleServer.Set("WebPort", "8065")
 	// grumbleServer.Set("Port", "4444")
 	// err = grumbleServer.Start()
 	// if err != nil {

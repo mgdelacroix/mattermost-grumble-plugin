@@ -29,7 +29,12 @@ type Plugin struct {
 
 // ServeHTTP demonstrates a plugin that handles HTTP requests by greeting the world.
 func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello grumble plugin!")
+	if !p.grumbleServer.IsRunning() {
+		fmt.Fprintf(w, "Grumble server has not been started")
+		return
+	}
+
+	p.grumbleServer.Webwsl().ServeHTTP(w, r)
 }
 
 func (p *Plugin) OnActivate() error {
