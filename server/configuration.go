@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/pkg/errors"
@@ -18,6 +19,10 @@ import (
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
 type configuration struct {
+	Port int
+	WebPort int
+	CertPath string
+	KeyPath string
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if
@@ -78,6 +83,23 @@ func (p *Plugin) OnConfigurationChange() error {
 	}
 
 	p.setConfiguration(configuration)
+
+	// configuration change happens with the plugin disabled
+	if p.grumbleServer == nil {
+		return nil
+	}
+
+	if err := p.StopServer(); err != nil {
+		return fmt.Errorf("error stopping server to update configuration: %w", err)
+	}
+
+	if err := p.applyConfig(); err != nil {
+		return fmt.Errorf("error applying updated configuration: %w", err)
+	}
+
+	if err := p.StartServer(); err != nil {
+		return fmt.Errorf("error starting server with updated configuration: %w", err)
+	}
 
 	return nil
 }

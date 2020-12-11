@@ -32,7 +32,7 @@ func createGrumbleCommand() *model.Command {
 }
 
 func getAutocompleteData() *model.AutocompleteData {
-	grumble := model.NewAutocompleteData(grumbleCommand, "[command]", "Grumble TBC")
+	grumble := model.NewAutocompleteData(grumbleCommand, "[command]", "Available commands: start, stop, status, help")
 
 	start := model.NewAutocompleteData(grumbleStartCommand, "", "Starts the grumble server")
 	grumble.AddCommand(start)
