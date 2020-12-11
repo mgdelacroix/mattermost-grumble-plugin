@@ -1,23 +1,27 @@
-import {Store, Action} from 'redux';
+import {id as pluginId} from './manifest';
 
-import {GlobalState} from 'mattermost-redux/types/store';
-
-import manifest from './manifest';
-
-// eslint-disable-next-line import/no-unresolved
-import {PluginRegistry} from './types/mattermost-webapp';
+import MumblePlugin from './components/MumblePlugin';
 
 export default class Plugin {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-    public async initialize(registry: PluginRegistry, store: Store<GlobalState, Action<Record<string, unknown>>>) {
-        // @see https://developers.mattermost.com/extend/plugins/webapp/reference/
+    // eslint-disable-next-line no-unused-vars
+    public initialize(registry: any, store: any): void {
+        const getCurrentUser = (): any => {
+            const state = store.getState();
+            const currentUserId = state.entities.users.currentUserId;
+            return state.entities.users.profiles[currentUserId];
+        };
+        registry.registerLeftSidebarHeaderComponent(
+            (): JSX.Element => {
+                return (<MumblePlugin getCurrentUser={getCurrentUser}/>)
+            }
+        );
     }
 }
 
 declare global {
     interface Window {
-        registerPlugin(id: string, plugin: Plugin): void
+        registerPlugin(id: string, plugin: Plugin): void;
     }
 }
 
-window.registerPlugin(manifest.id, new Plugin());
+window.registerPlugin(pluginId, new Plugin());

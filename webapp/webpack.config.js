@@ -42,7 +42,6 @@ module.exports = {
         modules: [
             'src',
             'node_modules',
-            path.resolve(__dirname),
         ],
         extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
     },
@@ -55,13 +54,13 @@ module.exports = {
                     loader: 'babel-loader',
                     options: {
                         cacheDirectory: true,
-
-                        // Babel configuration is in babel.config.js because jest requires it to be there.
+                        presets: ['@babel/preset-env'],
+                        plugins: ['@babel/plugin-transform-runtime'],
                     },
                 },
             },
             {
-                test: /\.(scss|css)$/,
+                test: /\.scss$/,
                 use: [
                     'style-loader',
                     {
@@ -70,11 +69,15 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            sassOptions: {
-                                includePaths: ['node_modules/compass-mixins/lib', 'sass'],
-                            },
                         },
                     },
+                ],
+            },
+            {
+                enforce: 'post',
+                test: /mumble-streams\/lib\/data.js/,
+                use: [
+                    'transform-loader?brfs',
                 ],
             },
         ],

@@ -1,0 +1,30 @@
+.voicechat-channel-list {
+  color: rgba(var(--sidebar-text-rgb), 0.6);
+  padding-left: 15px;
+
+  li {
+      list-style-type: none;
+  }
+
+  button {
+    padding: 7px 7px;
+    width: 100%;
+    color: rgba(var(--sidebar-text-rgb), 0.6);
+    text-align: left;
+    background: transparent;
+    border: 0px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  svg {
+    stroke: –sidebar-text;
+    margin-right: 8px;
+  }
+
+  &__users {
+    margin: 0 10px 0 0;
+  }
+}

@@ -1,0 +1,48 @@
+.voicechat-users-list {
+  color: rgba(var(--sidebar-text-rgb), 0.6);
+  padding: 0;
+  width: 100%;
+
+  .avatar {
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      border: 2px solid transparent;
+      margin-right: 5px;
+
+      &-active {
+          border: 2px solid rgba(var(--sidebar-text-rgb), 0.6);
+      }
+  }
+
+  li {
+    padding: 6px 17px;
+    width: 100%;
+    color: rgba(var(--sidebar-text-rgb), 0.6);
+    text-align: left;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    svg {
+      &.avatar {
+        margin-left: 0;
+        margin-right: 8px;
+      }
+      margin-left: 8px;
+      margin-right: 0;
+    }
+  }
+
+  svg {
+    stroke: –sidebar-text;
+    margin-right: 8px;
+  }
+
+  &__users {
+    margin: 0 20px 0 35px;
+  }
+}
