@@ -1,0 +1,227 @@
+# github.com/blang/semver v3.5.1+incompatible
+github.com/blang/semver
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
+# github.com/dyatlov/go-opengraph v0.0.0-20180429202543-816b6608b3c8
+github.com/dyatlov/go-opengraph/opengraph
+# github.com/fatih/color v1.9.0
+github.com/fatih/color
+# github.com/francoispqt/gojay v1.2.13
+github.com/francoispqt/gojay
+# github.com/fsnotify/fsnotify v1.4.9
+github.com/fsnotify/fsnotify
+# github.com/go-asn1-ber/asn1-ber v1.5.1
+github.com/go-asn1-ber/asn1-ber
+# github.com/golang/protobuf v1.4.2
+github.com/golang/protobuf/proto
+github.com/golang/protobuf/protoc-gen-go/descriptor
+github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/ptypes/any
+github.com/golang/protobuf/ptypes/duration
+github.com/golang/protobuf/ptypes/empty
+github.com/golang/protobuf/ptypes/timestamp
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/gorilla/websocket v1.4.2
+github.com/gorilla/websocket
+# github.com/hashicorp/errwrap v1.0.0
+github.com/hashicorp/errwrap
+# github.com/hashicorp/go-hclog v0.14.1
+github.com/hashicorp/go-hclog
+# github.com/hashicorp/go-multierror v1.1.0
+github.com/hashicorp/go-multierror
+# github.com/hashicorp/go-plugin v1.3.0
+github.com/hashicorp/go-plugin
+github.com/hashicorp/go-plugin/internal/plugin
+# github.com/hashicorp/yamux v0.0.0-20200609203250-aecfd211c9ce
+github.com/hashicorp/yamux
+# github.com/mattermost/go-i18n v1.11.0
+github.com/mattermost/go-i18n/i18n
+github.com/mattermost/go-i18n/i18n/bundle
+github.com/mattermost/go-i18n/i18n/language
+github.com/mattermost/go-i18n/i18n/translation
+# github.com/mattermost/ldap v0.0.0-20191128190019-9f62ba4b8d4d
+github.com/mattermost/ldap
+# github.com/mattermost/logr v1.0.5
+github.com/mattermost/logr
+github.com/mattermost/logr/format
+github.com/mattermost/logr/target
+# github.com/mattermost/mattermost-server/v5 v5.26.2
+github.com/mattermost/mattermost-server/v5/einterfaces
+github.com/mattermost/mattermost-server/v5/mlog
+github.com/mattermost/mattermost-server/v5/model
+github.com/mattermost/mattermost-server/v5/plugin
+github.com/mattermost/mattermost-server/v5/services/timezones
+github.com/mattermost/mattermost-server/v5/utils
+github.com/mattermost/mattermost-server/v5/utils/fileutils
+github.com/mattermost/mattermost-server/v5/utils/jsonutils
+github.com/mattermost/mattermost-server/v5/utils/markdown
+# github.com/mattn/go-colorable v0.1.7
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.12
+github.com/mattn/go-isatty
+# github.com/mitchellh/go-testing-interface v1.14.1
+github.com/mitchellh/go-testing-interface
+# github.com/oklog/run v1.1.0
+github.com/oklog/run
+# github.com/pborman/uuid v1.2.0
+github.com/pborman/uuid
+# github.com/pelletier/go-toml v1.8.0
+github.com/pelletier/go-toml
+# github.com/pkg/errors v0.9.1
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/stretchr/testify v1.6.1
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
+# github.com/wiggin77/cfg v1.0.2
+github.com/wiggin77/cfg
+github.com/wiggin77/cfg/ini
+github.com/wiggin77/cfg/timeconv
+# github.com/wiggin77/merror v1.0.2
+github.com/wiggin77/merror
+# github.com/wiggin77/srslog v1.0.1
+github.com/wiggin77/srslog
+# go.uber.org/atomic v1.6.0
+go.uber.org/atomic
+# go.uber.org/multierr v1.5.0
+go.uber.org/multierr
+# go.uber.org/zap v1.15.0
+go.uber.org/zap
+go.uber.org/zap/buffer
+go.uber.org/zap/internal/bufferpool
+go.uber.org/zap/internal/color
+go.uber.org/zap/internal/exit
+go.uber.org/zap/zapcore
+# golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/nacl/secretbox
+golang.org/x/crypto/poly1305
+golang.org/x/crypto/salsa20/salsa
+# golang.org/x/net v0.0.0-20200625001655-4c5254603344
+golang.org/x/net/context
+golang.org/x/net/html
+golang.org/x/net/html/atom
+golang.org/x/net/http/httpguts
+golang.org/x/net/http2
+golang.org/x/net/http2/hpack
+golang.org/x/net/idna
+golang.org/x/net/internal/timeseries
+golang.org/x/net/trace
+# golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
+golang.org/x/sys/cpu
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+# golang.org/x/text v0.3.3
+golang.org/x/text/internal/language
+golang.org/x/text/internal/language/compact
+golang.org/x/text/internal/tag
+golang.org/x/text/language
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# google.golang.org/genproto v0.0.0-20200626011028-ee7919e894b5
+google.golang.org/genproto/googleapis/rpc/status
+# google.golang.org/grpc v1.30.0
+google.golang.org/grpc
+google.golang.org/grpc/attributes
+google.golang.org/grpc/backoff
+google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/base
+google.golang.org/grpc/balancer/grpclb/state
+google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/codes
+google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/credentials/internal
+google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/health
+google.golang.org/grpc/health/grpc_health_v1
+google.golang.org/grpc/internal
+google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
+google.golang.org/grpc/internal/buffer
+google.golang.org/grpc/internal/channelz
+google.golang.org/grpc/internal/envconfig
+google.golang.org/grpc/internal/grpclog
+google.golang.org/grpc/internal/grpcrand
+google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/grpcutil
+google.golang.org/grpc/internal/resolver/dns
+google.golang.org/grpc/internal/resolver/passthrough
+google.golang.org/grpc/internal/serviceconfig
+google.golang.org/grpc/internal/status
+google.golang.org/grpc/internal/syscall
+google.golang.org/grpc/internal/transport
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/metadata
+google.golang.org/grpc/peer
+google.golang.org/grpc/reflection
+google.golang.org/grpc/reflection/grpc_reflection_v1alpha
+google.golang.org/grpc/resolver
+google.golang.org/grpc/serviceconfig
+google.golang.org/grpc/stats
+google.golang.org/grpc/status
+google.golang.org/grpc/tap
+# google.golang.org/protobuf v1.25.0
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/fieldsort
+google.golang.org/protobuf/internal/filedesc
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/genid
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/mapsort
+google.golang.org/protobuf/internal/pragma
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/internal/version
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/reflect/protoreflect
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/runtime/protoimpl
+google.golang.org/protobuf/types/descriptorpb
+google.golang.org/protobuf/types/known/anypb
+google.golang.org/protobuf/types/known/durationpb
+google.golang.org/protobuf/types/known/emptypb
+google.golang.org/protobuf/types/known/timestamppb
+# gopkg.in/natefinch/lumberjack.v2 v2.0.0
+gopkg.in/natefinch/lumberjack.v2
+# gopkg.in/yaml.v2 v2.3.0
+gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
+gopkg.in/yaml.v3
+# mumble.info/grumble v0.0.0-20200416032001-6f8c2bf2f51f => ../grumble
+mumble.info/grumble/grumble
+mumble.info/grumble/pkg/acl
+mumble.info/grumble/pkg/ban
+mumble.info/grumble/pkg/blobstore
+mumble.info/grumble/pkg/cryptstate
+mumble.info/grumble/pkg/cryptstate/ocb2
+mumble.info/grumble/pkg/freezer
+mumble.info/grumble/pkg/htmlfilter
+mumble.info/grumble/pkg/logtarget
+mumble.info/grumble/pkg/mumbleproto
+mumble.info/grumble/pkg/packetdata
+mumble.info/grumble/pkg/replacefile
+mumble.info/grumble/pkg/serverconf
+mumble.info/grumble/pkg/sessionpool
+mumble.info/grumble/pkg/web

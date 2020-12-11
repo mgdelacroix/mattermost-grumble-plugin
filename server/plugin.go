@@ -6,6 +6,10 @@ import (
 	"sync"
 
 	"github.com/mattermost/mattermost-server/v5/plugin"
+
+	"mumble.info/grumble/grumble"
+	// "mumble.info/grumble/pkg/logtarget"
+	// "mumble.info/grumble/pkg/web"
 )
 
 // Plugin implements the interface expected by the Mattermost server to communicate between the server and plugin processes.
@@ -18,11 +22,21 @@ type Plugin struct {
 	// configuration is the active plugin configuration. Consult getConfiguration and
 	// setConfiguration for usage.
 	configuration *configuration
+
+	// the grumble server instance
+	grumbleServer *grumble.Server
 }
 
 // ServeHTTP demonstrates a plugin that handles HTTP requests by greeting the world.
 func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello, world!")
+	fmt.Fprintf(w, "Hello grumble plugin!")
+}
+
+func (p *Plugin) OnActivate() error {
+	if err := p.API.RegisterCommand(createGrumbleCommand()); err != nil {
+		return err
+	}
+	return nil
 }
 
 // See https://developers.mattermost.com/extend/plugins/server/reference/

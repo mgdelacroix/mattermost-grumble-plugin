@@ -12,9 +12,9 @@ var manifest *model.Manifest
 
 const manifestStr = `
 {
-  "id": "com.mattermost.plugin-starter-template",
-  "name": "Plugin Starter Template",
-  "description": "This plugin serves as a starting point for writing a Mattermost plugin.",
+  "id": "com.mattermost.mattermost-grumble-plugin",
+  "name": "Mattermost Grumble Plugin",
+  "description": "This plugin enables voice conversation through mumble.",
   "version": "0.1.0",
   "min_server_version": "5.12.0",
   "server": {
@@ -31,7 +31,32 @@ const manifestStr = `
   "settings_schema": {
     "header": "",
     "footer": "",
-    "settings": []
+    "settings": [
+      {
+        "key": "port",
+        "display_name": "Mumble server port",
+        "type": "number",
+        "help_text": "The port that the mumble server will run in",
+        "placeholder": "",
+        "default": 64738
+      },
+      {
+        "key": "cert",
+        "display_name": "The TLS certificate file path",
+        "type": "string",
+        "help_text": "",
+        "placeholder": "",
+        "default": null
+      },
+      {
+        "key": "key",
+        "display_name": "The TLS key file path",
+        "type": "string",
+        "help_text": "",
+        "placeholder": "",
+        "default": null
+      }
+    ]
   }
 }
 `

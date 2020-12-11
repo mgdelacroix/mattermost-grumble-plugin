@@ -9,4 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.6.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	mumble.info/grumble v0.0.0-20200416032001-6f8c2bf2f51f
 )
+
+replace mumble.info/grumble => ../grumble
