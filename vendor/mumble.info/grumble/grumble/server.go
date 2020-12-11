@@ -19,6 +19,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -29,7 +30,7 @@ import (
 	"mumble.info/grumble/pkg/ban"
 	"mumble.info/grumble/pkg/freezer"
 	"mumble.info/grumble/pkg/htmlfilter"
-	"mumble.info/grumble/pkg/logtarget"
+	// "mumble.info/grumble/pkg/logtarget"
 	"mumble.info/grumble/pkg/mumbleproto"
 	"mumble.info/grumble/pkg/serverconf"
 	"mumble.info/grumble/pkg/sessionpool"
@@ -38,7 +39,7 @@ import (
 
 // The default port a Murmur server listens on
 const DefaultPort = 64738
-const DefaultWebPort = 4443
+const DefaultWebPort = 443
 const UDPPacketSize = 1024
 
 const LogOpsBeforeSync = 100
@@ -156,14 +157,15 @@ func NewServer(id int64) (s *Server, err error) {
 	s.Channels[0] = NewChannel(0, "Root")
 	s.nextChanId = 1
 
-	s.Logger = log.New(logtarget.Default, fmt.Sprintf("[%v] ", s.Id), log.LstdFlags|log.Lmicroseconds)
+	// s.Logger = log.New(logtarget.Default, fmt.Sprintf("[%v] ", s.Id), log.LstdFlags|log.Lmicroseconds)
+	s.Logger = log.New(os.Stdout, fmt.Sprintf("[%v] ", s.Id), log.LstdFlags|log.Lmicroseconds)
 
 	return
 }
 
 // Debugf implements debug-level printing for Servers.
 func (server *Server) Debugf(format string, v ...interface{}) {
-	fmt.Printf(format, v...)
+	server.Printf(format, v...)
 }
 
 // RootChannel gets a pointer to the root channel
@@ -273,7 +275,7 @@ func (server *Server) handleIncomingClient(conn net.Conn) (err error) {
 	client.Logger = log.New(client.lf, "", 0)
 
 	client.session = server.pool.Get()
-	fmt.Printf("New connection: %v (%v)", conn.RemoteAddr(), client.Session())
+	client.Printf("New connection: %v (%v)", conn.RemoteAddr(), client.Session())
 
 	client.tcpaddr = addr.(*net.TCPAddr)
 	client.server = server
@@ -293,7 +295,7 @@ func (server *Server) handleIncomingClient(conn net.Conn) (err error) {
 	if tlsconn, ok := client.conn.(*tls.Conn); ok {
 		err = tlsconn.Handshake()
 		if err != nil {
-			fmt.Printf("TLS handshake failed: %v", err)
+			client.Printf("TLS handshake failed: %v", err)
 			client.Disconnect()
 			return
 		}
@@ -308,7 +310,7 @@ func (server *Server) handleIncomingClient(conn net.Conn) (err error) {
 
 		// Check whether the client's cert hash is banned
 		if server.IsCertHashBanned(client.CertHash()) {
-			fmt.Printf("Certificate hash is banned")
+			client.Printf("Certificate hash is banned")
 			client.Disconnect()
 			return
 		}
@@ -373,7 +375,7 @@ func (server *Server) AddChannel(name string) (channel *Channel) {
 // RemoveChanel removes a channel from the server.
 func (server *Server) RemoveChanel(channel *Channel) {
 	if channel.Id == 0 {
-		fmt.Printf("Attempted to remove root channel.")
+		server.Printf("Attempted to remove root channel.")
 		return
 	}
 
@@ -606,7 +608,7 @@ func (server *Server) finishAuthenticate(client *Client) {
 	// Warn clients without CELT support that they might not be able to talk to everyone else.
 	if len(client.codecs) == 0 {
 		client.codecs = []int32{CeltCompatBitstream}
-		fmt.Printf("Client %v connected without CELT codecs. Faking compat bitstream.", client.Session())
+		server.Printf("Client %v connected without CELT codecs. Faking compat bitstream.", client.Session())
 		if server.Opus && !client.opus {
 			client.sendMessage(&mumbleproto.TextMessage{
 				Session: []uint32{client.Session()},
@@ -786,7 +788,7 @@ func (server *Server) updateCodecVersions(connecting *Client) {
 		Opus:        proto.Bool(server.Opus),
 	})
 	if err != nil {
-		fmt.Printf("Unable to broadcast.")
+		server.Printf("Unable to broadcast.")
 		return
 	}
 
@@ -806,7 +808,7 @@ func (server *Server) updateCodecVersions(connecting *Client) {
 		}
 	}
 
-	fmt.Printf("CELT codec switch %#x %#x (PreferAlpha %v) (Opus %v)", uint32(server.AlphaCodec), uint32(server.BetaCodec), server.PreferAlphaCodec, server.Opus)
+	server.Printf("CELT codec switch %#x %#x (PreferAlpha %v) (Opus %v)", uint32(server.AlphaCodec), uint32(server.BetaCodec), server.PreferAlphaCodec, server.Opus)
 	return
 }
 
@@ -958,7 +960,7 @@ func (server *Server) handleIncomingMessage(client *Client, msg *Message) {
 	case mumbleproto.MessageCryptSetup:
 		server.handleCryptSetup(msg.client, msg)
 	case mumbleproto.MessageContextAction:
-		fmt.Printf("MessageContextAction from client")
+		server.Printf("MessageContextAction from client")
 	case mumbleproto.MessageUserList:
 		server.handleUserList(msg.client, msg)
 	case mumbleproto.MessageVoiceTarget:
@@ -995,7 +997,7 @@ func (server *Server) udpListenLoop() {
 
 		udpaddr, ok := remote.(*net.UDPAddr)
 		if !ok {
-			fmt.Printf("No UDPAddr in read packet. Disabling UDP. (Windows?)")
+			server.Printf("No UDPAddr in read packet. Disabling UDP. (Windows?)")
 			return
 		}
 
@@ -1319,10 +1321,10 @@ func (server *Server) acceptLoop(listener net.Listener) {
 
 		// Is the client IP-banned?
 		if server.IsConnectionBanned(conn) {
-			fmt.Printf("Rejected client %v: Banned", conn.RemoteAddr())
+			server.Printf("Rejected client %v: Banned", conn.RemoteAddr())
 			err := conn.Close()
 			if err != nil {
-				fmt.Printf("Unable to close connection: %v", err)
+				server.Printf("Unable to close connection: %v", err)
 			}
 			continue
 		}
@@ -1331,7 +1333,7 @@ func (server *Server) acceptLoop(listener net.Listener) {
 		// which wraps net.TCPConn.
 		err = server.handleIncomingClient(conn)
 		if err != nil {
-			fmt.Printf("Unable to handle new client: %v", err)
+			server.Printf("Unable to handle new client: %v", err)
 			continue
 		}
 	}
@@ -1503,9 +1505,9 @@ func (server *Server) Start() (err error) {
 			}
 		}()
 
-		fmt.Printf("Started: listening on %v and %v", server.tcpl.Addr(), server.webwsl.Addr())
+		server.Printf("Started: listening on %v and %v", server.tcpl.Addr(), server.webwsl.Addr())
 	} else {
-		fmt.Printf("Started: listening on %v", server.tcpl.Addr())
+		server.Printf("Started: listening on %v", server.tcpl.Addr())
 	}
 
 	server.running = true
@@ -1611,7 +1613,7 @@ func (server *Server) Stop() (err error) {
 
 	server.cleanPerLaunchData()
 	server.running = false
-	fmt.Printf("Stopped")
+	server.Printf("Stopped")
 
 	return nil
 }
@@ -1631,8 +1633,8 @@ func (server *Server) StartWithConfig() (err error) {
 
 	host := server.HostAddress()
 	port := server.Port()
-	// webport := server.WebPort()
-	// shouldListenWeb := server.ListenWebPort()
+	webport := server.WebPort()
+	shouldListenWeb := server.ListenWebPort()
 
 	// Setup our UDP listener
 	server.udpconn, err = net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(host), Port: port})
@@ -1661,7 +1663,41 @@ func (server *Server) StartWithConfig() (err error) {
 	}
 	server.tlsl = tls.NewListener(server.tcpl, server.tlscfg)
 
-	fmt.Printf("Started: listening on %v", server.tcpl.Addr())
+	if shouldListenWeb {
+		// Create HTTP server and WebSocket "listener"
+		webaddr := &net.TCPAddr{IP: net.ParseIP(host), Port: webport}
+		// server.webtlscfg = &tls.Config{
+		// 	Certificates: []tls.Certificate{cert},
+		// 	ClientAuth:   tls.NoClientCert,
+		// 	NextProtos:   []string{"http/1.1"},
+		// }
+		server.webwsl = web.NewListener(webaddr, server.Logger)
+		// mux := http.NewServeMux()
+		// mux.Handle("/", server.webwsl)
+		// server.webhttp = &http.Server{
+		// 	Addr:      webaddr.String(),
+		// 	Handler:   mux,
+		// 	TLSConfig: server.webtlscfg,
+		// 	ErrorLog:  server.Logger,
+
+		// 	// Set sensible timeouts, in case no reverse proxy is in front of Grumble.
+		// 	// Non-conforming (or malicious) clients may otherwise block indefinitely and cause
+		// 	// file descriptors (or handles, depending on your OS) to leak and/or be exhausted
+		// 	ReadTimeout:  5 * time.Second,
+		// 	WriteTimeout: 10 * time.Second,
+		// 	IdleTimeout:  2 * time.Minute,
+		// }
+		// go func() {
+		// 	err := server.webhttp.ListenAndServeTLS("", "")
+		// 	if err != http.ErrServerClosed {
+		// 		server.Fatalf("Fatal HTTP server error: %v", err)
+		// 	}
+		// }()
+
+		server.Printf("Started: listening on %v and %v", server.tcpl.Addr(), server.webwsl.Addr())
+	} else {
+		server.Printf("Started: listening on %v", server.tcpl.Addr())
+	}
 
 	server.running = true
 
@@ -1687,16 +1723,16 @@ func (server *Server) StartWithConfig() (err error) {
 	// netwg.Done(). In the Stop() we close all the connections
 	// and call netwg.Wait() to wait for the goroutines to end.
 	numWG := 2
-	// if shouldListenWeb {
-	// 	numWG++
-	// }
+	if shouldListenWeb {
+		numWG++
+	}
 
 	server.netwg.Add(numWG)
 	go server.udpListenLoop()
 	go server.acceptLoop(server.tlsl)
-	// if shouldListenWeb {
-	// 	go server.acceptLoop(server.webwsl)
-	// }
+	if shouldListenWeb {
+		go server.acceptLoop(server.webwsl)
+	}
 
 	// Schedule a server registration update (if needed)
 	go func() {
@@ -1709,4 +1745,8 @@ func (server *Server) StartWithConfig() (err error) {
 
 func (server *Server) IsRunning() (bool) {
 	return server.running
+}
+
+func (server *Server) Webwsl() *web.Listener {
+	return server.webwsl
 }

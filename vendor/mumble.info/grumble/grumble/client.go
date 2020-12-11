@@ -10,7 +10,6 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -95,7 +94,7 @@ type Client struct {
 
 // Debugf implements debug-level printing for Clients.
 func (client *Client) Debugf(format string, v ...interface{}) {
-	fmt.Printf(format, v...)
+	client.Printf(format, v...)
 }
 
 // IsRegistered Is the client a registered user?
@@ -168,7 +167,7 @@ func (client *Client) Panic(v ...interface{}) {
 
 // Log a formatted panic and disconnect the client.
 func (client *Client) Panicf(format string, v ...interface{}) {
-	fmt.Printf(format, v...)
+	client.Printf(format, v...)
 	client.Disconnect()
 }
 
@@ -192,7 +191,7 @@ func (client *Client) disconnect(kicked bool) {
 			close(client.clientReady)
 		}
 
-		fmt.Printf("Disconnected")
+		client.Printf("Disconnected")
 		client.conn.Close()
 
 		client.server.updateCodecVersions(nil)
