@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"sync"
@@ -103,18 +104,32 @@ func (p *Plugin) applyConfig() error {
 	p.grumbleServer.Set("Port", strconv.Itoa(p.configuration.Port))
 	p.grumbleServer.Set("WebPort", strconv.Itoa(p.configuration.WebPort))
 
-	var appErr *model.AppError
-	var certBytes, keyBytes []byte
-	certBytes, keyBytes, appErr = p.Certs()
-	if appErr != nil {
-		p.API.LogInfo("Certificates not found, generating")
-		certBytes, keyBytes, err := grumble.GenerateSelfSignedCertBytes()
-		if err != nil {
-			return fmt.Errorf("cannot generate self signed certificates: %w", err)
-		}
 
-		if err := p.SetCerts(certBytes, keyBytes); err != nil {
-			return fmt.Errorf("cannot save certs in the kvstore: %w", err)
+	var certBytes, keyBytes []byte
+	if p.configuration.CertPath != "" && p.configuration.KeyPath != "" {
+		p.API.LogDebug("Reading certificate files")
+		var err error
+		certBytes, err = ioutil.ReadFile(p.configuration.CertPath)
+		if err != nil {
+			return fmt.Errorf("error reading certificate file %q: %w", p.configuration.CertPath, err)
+		}
+		keyBytes, err = ioutil.ReadFile(p.configuration.KeyPath)
+		if err != nil {
+			return fmt.Errorf("error reading certificate key file %q: %w", p.configuration.KeyPath, err)
+		}
+	} else {
+		var appErr *model.AppError
+		certBytes, keyBytes, appErr = p.Certs()
+		if appErr != nil {
+			p.API.LogInfo("Certificates not found, generating")
+			certBytes, keyBytes, err := grumble.GenerateSelfSignedCertBytes()
+			if err != nil {
+				return fmt.Errorf("cannot generate self signed certificates: %w", err)
+			}
+
+			if err := p.SetCerts(certBytes, keyBytes); err != nil {
+				return fmt.Errorf("cannot save certs in the kvstore: %w", err)
+			}
 		}
 	}
 
