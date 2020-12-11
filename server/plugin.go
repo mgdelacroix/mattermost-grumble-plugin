@@ -136,7 +136,7 @@ func (p *Plugin) applyConfig() error {
 
 func (p *Plugin) StartServer() error {
 	p.API.LogInfo("Starting grumble server")
-	if !p.grumbleServer.IsRunning() {
+	if p.grumbleServer.IsRunning() {
 		p.API.LogInfo("Server already running. Skipping start")
 		return nil
 	}

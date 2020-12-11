@@ -80,6 +80,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 
 func (p *Plugin) executeStartCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	text := "Grumble server started"
+	p.API.LogInfo("Starting server through slash command")
 	err := p.grumbleServer.StartWithConfig()
 	if err != nil {
 		text = fmt.Sprintf("Error starting grumble server: %s", err)
@@ -96,6 +97,7 @@ func (p *Plugin) executeStartCommand(c *plugin.Context, args *model.CommandArgs)
 
 func (p *Plugin) executeStopCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
 	text := "Grumble server stopped"
+	p.API.LogInfo("Stopping server through slash command")
 	err := p.grumbleServer.Stop()
 	if err != nil {
 		text = fmt.Sprintf("Error stopping grumble server: %s", err)
