@@ -162,7 +162,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         this.setState({connecting: true});
         try {
             const currentUser = this.props.getCurrentUser()
-            this.client = await mumbleClient('wss://localhost:443', {
+            this.client = await mumbleClient(`wss://${location.hostname}:8090`, {
                 username: `${currentUser.username} mmid:${currentUser.id}`,
                 password: '',
                 tokens: [],

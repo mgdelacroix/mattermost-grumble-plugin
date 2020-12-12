@@ -1742,7 +1742,13 @@ func (server *Server) StartWithConfig() (err error) {
 	return nil
 }
 
-func (server *Server) IsRunning() (bool) {
+func (server *Server) BroadcastChannels() {
+	for _, client := range server.clients {
+		client.sendChannelList()
+	}
+}
+
+func (server *Server) IsRunning() bool {
 	return server.running
 }
 
