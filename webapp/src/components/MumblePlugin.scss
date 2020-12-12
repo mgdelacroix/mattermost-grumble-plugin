@@ -11,6 +11,36 @@
     font-weight: 600;
     text-transform: uppercase;
     padding: 7px 16px;
+    display: flex;
+    align-items: center;
+    height: 43px;
+
+    span {
+        flex-grow: 1;
+    }
+  }
+
+  &__add-channel {
+    padding: 0;
+    color: rgba(var(--sidebar-text-rgb), 0.6);
+    background: transparent;
+    text-align: left;
+    border: 0px;
+    border-radius: 4px;
+    font-size: 20px;
+
+    &:hover {
+      color: rgba(var(--sidebar-text-rgb), 1);
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  &__add-channel-input {
+    margin-left: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 0px;
+    border-radius: 4px;
+    padding: 7px;
   }
 
   .connecting {
@@ -29,7 +59,6 @@
     padding: 7px 7px;
     color: rgba(var(--sidebar-text-rgb), 0.6);
     text-align: left;
-    background: transparent;
     border: 0px;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.08);

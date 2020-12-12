@@ -23,7 +23,7 @@ const getUserMedia = async (client): Promise<MediaStream> => {
 }
 
 type Props = {
-    getCurrentUser: () => any
+    getCurrentUser: () => any;
 };
 
 type State = {
@@ -36,10 +36,13 @@ type State = {
     connected: boolean;
     connecting: boolean;
     connectError: string;
+    addingChannel: boolean;
+    newChannelName: string;
 };
 
 export default class MumblePlugin extends React.PureComponent<Props, State> {
-    client: mumbleClient = null
+    private client: mumbleClient = null;
+    private inputRef = React.createRef<HTMLInputElement>();
 
     public constructor(props: Props) {
         super(props);
@@ -52,6 +55,8 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
             deafed: false,
             connected: false,
             connectError: '',
+            addingChannel: false,
+            newChannelName: '',
         };
     }
 
@@ -161,13 +166,13 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
     private connect = async (): void => {
         this.setState({connecting: true});
         try {
-            const currentUser = this.props.getCurrentUser()
+            const currentUser = this.props.getCurrentUser();
             this.client = await mumbleClient(`wss://${location.hostname}:8090`, {
                 username: `${currentUser.username} mmid:${currentUser.id}`,
                 password: '',
                 tokens: [],
             });
-            const rootChannel = this.client.root
+            const rootChannel = this.client.root;
             this.setState({
                 channels: this.client.channels.reduce((acc: {[key: string]: {id: string, name: string}}, chan: any): {[key: string]: {id: string, name: string}} => {
                     acc[chan._id] = {id: chan._id, name: chan.name};
@@ -214,11 +219,53 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         });
     }
 
+    private handleNewChannelKey = (e: React.KeyboardEvent): void => {
+        const ESC = 27;
+        const ENTER = 13;
+        if (e.keyCode === ESC) {
+            this.setState({newChannelName: '', addingChannel: false});
+            e.preventDefault();
+        }
+        if (e.keyCode === ENTER) {
+            // TODO: Create the new channel using the API
+            console.log('Creating new channel:', this.state.newChannelName);
+            this.setState({newChannelName: '', addingChannel: false});
+            e.preventDefault();
+        }
+    }
+
     public render(): JSX.Element {
+        const currentUser = this.props.getCurrentUser();
         return (
             <div className='voicechat-plugin'>
                 <div>
-                    <div className='voicechat-plugin__headline'>{'Voice Rooms'}</div>
+                    <div className='voicechat-plugin__headline'>
+                        <span>{'Voice Rooms'}</span>
+                        {!this.state.addingChannel && this.state.connected && currentUser.roles.indexOf('system_admin') !== -1 &&
+                            <button
+                                className='voicechat-plugin__add-channel'
+                                onClick={(): void => {
+                                    this.setState({addingChannel: true, newChannelName: ''});
+                                    setTimeout((): void => {
+                                        if (this.inputRef.current) {
+                                            this.inputRef.current.focus();
+                                        }
+                                    }, 10);
+                                }}
+                            >
+                                <i className='icon-plus'/>
+                            </button>}
+                    </div>
+                    <input
+                        className='voicechat-plugin__add-channel-input'
+                        ref={this.inputRef}
+                        style={{display: this.state.addingChannel ? 'block' : 'none'}}
+                        type='text'
+                        placeholder='New channel name'
+                        value={this.state.newChannelName}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>): void => this.setState({newChannelName: e.target.value})}
+                        onKeyDown={this.handleNewChannelKey}
+                    />
                     {this.state.connected &&
                         <>
                             <ChannelList
