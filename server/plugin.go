@@ -117,7 +117,6 @@ func (p *Plugin) applyConfig() error {
 	p.grumbleServer.Set("Port", strconv.Itoa(p.configuration.Port))
 	p.grumbleServer.Set("WebPort", strconv.Itoa(p.configuration.WebPort))
 
-
 	var certBytes, keyBytes []byte
 	if p.configuration.CertPath != "" && p.configuration.KeyPath != "" {
 		p.API.LogDebug("Reading certificate files")
@@ -183,7 +182,7 @@ func (p *Plugin) ServerState() (*freezer.Server, error) {
 	}
 
 	fs := &freezer.Server{
-		Users: users,
+		Users:    users,
 		Channels: channels,
 	}
 

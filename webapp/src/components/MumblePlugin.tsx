@@ -2,23 +2,25 @@ import React, {useState, useEffect} from 'react';
 
 import mumbleClient from 'mumble-client-websocket';
 
+import audioContext from 'audio-context'
+
+
 import {Channel, User} from '../types';
 
 import ChannelList from './ChannelList';
 import MumbleControlBar from './MumbleControlBar';
 import './MumblePlugin.scss';
 
-import {VADVoiceHandler, ContinuousVoiceHandler, initVoice} from '../voice';
+import {VADVoiceHandler, ContinuousVoiceHandler, PushToTalkVoiceHandler, VoiceHandler, initVoice} from '../voice';
+let voiceHandler: VoiceHandler;
 
-const getUserMedia = async (client): Promise<MediaStream> => {
+const getUserMedia = async (): Promise<MediaStream> => {
     //const voiceHandler = new VADVoiceHandler(client, {vadLevel: 0.3});
-    const voiceHandler = new ContinuousVoiceHandler(client, {vadLevel: 0.3});
-    console.log(voiceHandler);
     const userMedia = await initVoice((data: any): void => {
-        voiceHandler.write(data);
+        if (voiceHandler) {
+            voiceHandler.write(data);
+        }
     });
-    client.connectVoiceStream(userMedia);
-    console.log('promise', userMedia);
     return userMedia;
 }
 
@@ -163,13 +165,74 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         });
     };
 
+    private updateVoiceHandler = (): void => {
+        if (!this.client) {
+            return
+        }
+        if (voiceHandler) {
+            voiceHandler.end()
+            voiceHandler = null
+        }
+        const mode = 'vad';
+        if (mode === 'cont') {
+            voiceHandler = new ContinuousVoiceHandler(this.client, {})
+        } else if (mode === 'ptt') {
+            voiceHandler = new PushToTalkVoiceHandler(this.client, {})
+        } else if (mode === 'vad') {
+            voiceHandler = new VADVoiceHandler(this.client, {vadLevel: 0.3})
+        } else {
+            return
+        }
+        voiceHandler.on('started_talking', (): void => {
+            if (this.client.self) {
+                this.client.self.talking('on')
+            }
+        })
+        voiceHandler.on('stopped_talking', (): void => {
+            if (this.client.self) {
+                this.client.self.talking('off')
+            }
+        })
+        if (this.client.self.selfMute) {
+            voiceHandler.setMute(true)
+        }
+   
+        this._micNode.disconnect()
+        this._delayNode.disconnect()
+        if (mode === 'vad') {
+            this._micNode.connect(this._delayNode)
+            this._delayNode.connect(this._delayedMicNode)
+        } else {
+            this._micNode.connect(this._delayedMicNode)
+        }
+  
+        this.client.setAudioQuality(40000, 960)
+   }
+
+
     private connect = async (): void => {
         this.setState({connecting: true});
+        const ctx = audioContext();
         try {
             const currentUser = this.props.getCurrentUser();
+            const userMedia = getUserMedia();
+
+            if (!this._delayedMicNode) {
+                this._micNode = ctx.createMediaStreamSource(this._micStream)
+                this._delayNode = ctx.createDelay()
+                this._delayNode.delayTime.value = 0.15
+                this._delayedMicNode = ctx.createMediaStreamDestination()
+            }
+
             this.client = await mumbleClient(`wss://${location.hostname}:8090`, {
                 username: `${currentUser.username} mmid:${currentUser.id}`,
                 password: '',
+                webrtc: {
+                    enabled: true,
+                    required: true,
+                    mic: this._delayedMicNode.stream,
+                    audioContext: ctx,
+                },
                 tokens: [],
             });
             const rootChannel = this.client.root;
@@ -184,9 +247,9 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
                 connecting: false,
                 connectError: '',
             });
+            this.updateVoiceHandler();
             this.handleClientEvents();
 
-            getUserMedia(this.client);
         } catch (e) {
             this.setState({
                 connected: false,
