@@ -11,6 +11,7 @@ import (
 	"github.com/mattermost/mattermost-server/v5/plugin"
 
 	"mumble.info/grumble/grumble"
+	"mumble.info/grumble/pkg/freezer"
 	// "mumble.info/grumble/pkg/logtarget"
 	// "mumble.info/grumble/pkg/web"
 )
@@ -72,11 +73,22 @@ func (p *Plugin) OnActivate() error {
 	p.API.LogInfo("Activating plugin")
 
 	var err error
-	p.grumbleServer, err = grumble.NewServer(1) // ToDo: maybe load from kvstore if existing already?
+	p.grumbleServer, err = grumble.NewServer(1)
 	if err != nil {
 		return fmt.Errorf("cannot create grumble server: %w", err)
 	}
 	p.grumbleServer.Set("NoWebServer", "false")
+
+	fs, err := p.ServerState()
+	if err != nil {
+		return fmt.Errorf("cannot load server state: %w", err)
+	}
+
+	if len(fs.Users) > 0 || len(fs.Channels) > 0 {
+		if err := p.Unfreeze(fs); err != nil {
+			p.API.LogError("cannot unfreeze server state: " + err.Error())
+		}
+	}
 
 	if err := p.applyConfig(); err != nil {
 		return fmt.Errorf("error applying plugin configuration: %w", err)
@@ -91,11 +103,12 @@ func (p *Plugin) OnActivate() error {
 
 func (p *Plugin) OnDeactivate() error {
 	p.API.LogInfo("Deactivating plugin")
-	grumbleServer := p.grumbleServer
+
+	err := p.StopServer()
 	p.grumbleServer = nil
 	p.usingGeneratedCerts = false
 
-	return grumbleServer.Stop()
+	return err
 }
 
 func (p *Plugin) applyConfig() error {
@@ -136,16 +149,54 @@ func (p *Plugin) applyConfig() error {
 	p.grumbleServer.Set("Cert", string(certBytes))
 	p.grumbleServer.Set("Key", string(keyBytes))
 
-	/*
-	// ToDo: read certs
-	if p.configuration.CertPath != "" && p.configuration.KeyPath != "" {
-		p.usingGeneratedCerts = false
+	return nil
+}
 
-	} else if !p.usingGeneratedCerts {
-		p.usingGeneratedCerts = true
-		// ToDo: generate and use certs
+func (p *Plugin) SaveServerState() error {
+	p.API.LogInfo("Saving server state")
+
+	fs, err := p.grumbleServer.Freeze()
+	if err != nil {
+		return fmt.Errorf("cannot freeze to save server state: %w", err)
 	}
-	*/
+
+	if err := p.Helpers.KVSetJSON("users", fs.Users); err != nil {
+		return fmt.Errorf("cannot save users: %w", err)
+	}
+
+	if err := p.Helpers.KVSetJSON("channels", fs.Channels); err != nil {
+		return fmt.Errorf("cannot save channels: %w", err)
+	}
+
+	return nil
+}
+
+func (p *Plugin) ServerState() (*freezer.Server, error) {
+	users := []*freezer.User{}
+	if _, err := p.Helpers.KVGetJSON("users", &users); err != nil {
+		return nil, fmt.Errorf("cannot load users: %w", err)
+	}
+
+	channels := []*freezer.Channel{}
+	if _, err := p.Helpers.KVGetJSON("channels", &channels); err != nil {
+		return nil, fmt.Errorf("cannot load channels: %w", err)
+	}
+
+	fs := &freezer.Server{
+		Users: users,
+		Channels: channels,
+	}
+
+	return fs, nil
+}
+
+func (p *Plugin) Unfreeze(fs *freezer.Server) error {
+	p.API.LogInfo("Unfreezing server state")
+	if err := p.grumbleServer.UnfreezeUsers(fs); err != nil {
+		return fmt.Errorf("cannot unfreeze users: %w", err)
+	}
+	p.grumbleServer.UnfreezeChannels(fs)
+
 	return nil
 }
 
@@ -164,6 +215,10 @@ func (p *Plugin) StopServer() error {
 	if !p.grumbleServer.IsRunning() {
 		p.API.LogInfo("Server already stopped. Skipping stop")
 		return nil
+	}
+
+	if err := p.SaveServerState(); err != nil {
+		p.API.LogError("cannot save server state: %w", err)
 	}
 
 	return p.grumbleServer.Stop()

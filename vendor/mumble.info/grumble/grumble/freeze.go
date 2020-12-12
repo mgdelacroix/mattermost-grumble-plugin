@@ -861,3 +861,69 @@ func (server *Server) ResetConfig(key string) {
 	}
 	server.numLogOps += 1
 }
+
+func (server *Server) UnfreezeUsers(fs *freezer.Server) error {
+	// Add all users
+	for _, fu := range fs.Users {
+		if fu.Id == nil && fu.Name == nil {
+			continue
+		}
+		u, err := NewUser(*fu.Id, *fu.Name)
+		if err != nil {
+			return err
+		}
+		if u.Id >= server.nextUserId {
+			server.nextUserId = u.Id + 1
+		}
+
+		// Merge the contents of the freezer.User into
+		// the user struct.
+		u.Unfreeze(fu)
+
+		// Update the server's user maps to point correctly
+		// to the new user.
+		server.Users[u.Id] = u
+		server.UserNameMap[u.Name] = u
+		if len(u.CertHash) > 0 {
+			server.UserCertMap[u.CertHash] = u
+		}
+	}
+
+	return nil
+}
+
+func (server *Server) UnfreezeChannels(fs *freezer.Server) {
+	// Add all channels, but don't hook up parent/child relationships
+	// until after we've walked the log file. No need to make it harder
+	// than it really is.
+	parents := make(map[uint32]uint32)
+	for _, fc := range fs.Channels {
+		// The frozen channel must contain an Id and a Name,
+		// since the server's frozen channels are guaranteed to
+		// not be deltas.
+		if fc.Id == nil || fc.Name == nil {
+			continue
+		}
+
+		// Create the channel on the server.
+		// Update the server's nextChanId field if it needs to be,
+		// to make sure the server doesn't re-use channel id's.
+		c := NewChannel(int(*fc.Id), *fc.Name)
+		if c.Id >= server.nextChanId {
+			server.nextChanId = c.Id + 1
+		}
+
+		// Update the channel with the contents of the freezer.Channel.
+		c.Unfreeze(fc)
+
+		// Add the channel's id to the server's channel-id-map.
+		server.Channels[c.Id] = c
+
+		// Mark the channel's parent
+		if fc.ParentId != nil {
+			parents[*fc.Id] = *fc.ParentId
+		} else {
+			delete(parents, *fc.Id)
+		}
+	}
+}
