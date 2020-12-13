@@ -12,7 +12,7 @@ application/json`.
 
 ### Create channel
 
-- **URL**: `/create`
+- **URL**: `/channels`
 - **Method**: `POST`
 - **Parameters**:
 
@@ -31,7 +31,7 @@ Response is an object representing a channel.
 
 ### List channels
 
-- **URL**: `/create`
+- **URL**: `/channels`
 - **Method**: `GET`
 - **Response**:
 
@@ -44,7 +44,7 @@ Response is a list of channels.
 
 ### Delete channels
 
-- **URL**: `/create/{id}`
+- **URL**: `/channels/{id}`
 - **Method**: `DELETE`
 - **Response**:
 
