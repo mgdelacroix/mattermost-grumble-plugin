@@ -150,6 +150,8 @@ func (p *Plugin) SaveServerState() error {
 		return fmt.Errorf("cannot save channels: %w", err)
 	}
 
+	p.API.LogInfo("Saved server state, users=" + len(fs.Users) " channels=" + len(fs.Channels))
+
 	return nil
 }
 
@@ -168,6 +170,8 @@ func (p *Plugin) ServerState() (*freezer.Server, error) {
 		Users: users,
 		Channels: channels,
 	}
+
+	p.API.LogInfo("Recovered server state, users=" + len(users) " channels=" + len(channels))
 
 	return fs, nil
 }
