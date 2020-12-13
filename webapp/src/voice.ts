@@ -158,12 +158,13 @@ export class VADVoiceHandler extends VoiceHandler {
 
 var theUserMedia = null
 
-export async function initVoice(onData: (data: any) => void): Promise<MediaStream> {
-    const userMedia = await window.navigator.mediaDevices.getUserMedia({audio: true});
-    theUserMedia = userMedia;
-    var micStream = new MicrophoneStream(userMedia, {objectMode: true, bufferSize: 1024});
-    micStream.on('data', (data: any): void => {
-        onData(Buffer.from(data.getChannelData(0).buffer));
+export function initVoice(onData: (data: any) => void): MediaStream {
+    return window.navigator.mediaDevices.getUserMedia({audio: true}).then((userMedia) => {
+        theUserMedia = userMedia;
+        var micStream = new MicrophoneStream(userMedia, {objectMode: true, bufferSize: 1024});
+        micStream.on('data', (data: any): void => {
+            onData(Buffer.from(data.getChannelData(0).buffer));
+        });
+        return userMedia;
     });
-    return userMedia;
 }

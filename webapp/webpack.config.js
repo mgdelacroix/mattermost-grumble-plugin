@@ -80,6 +80,15 @@ module.exports = {
                     'transform-loader?brfs',
                 ],
             },
+            {
+                test: /worker\.js$/,
+                use: {
+                    loader: 'worker-loader',
+                    options: {
+                        publicPath: '/static/plugins/com.mattermost.mattermost-grumble-plugin/',
+                    },
+                },
+            },
         ],
     },
     externals: {
