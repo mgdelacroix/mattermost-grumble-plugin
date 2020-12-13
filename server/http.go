@@ -62,9 +62,9 @@ func (p *Plugin) createChannelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rootC := p.grumbleServer.Channels[0]
 	c := p.grumbleServer.AddChannel(params.String("name"))
-	rootC.AddChild(c)
+	p.grumbleServer.RootChannel().AddChild(c)
+	p.grumbleServer.BroadcastChannels()
 
 	w.WriteHeader(201)
 	w.Header().Add("Content-Type", "application/json")
@@ -94,13 +94,9 @@ func (p *Plugin) removeChannelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bb, _ := json.MarshalIndent(p.grumbleServer.Channels[0], "", "  ")
-	p.API.LogInfo(string(bb))
-
-	b, _ := json.MarshalIndent(channel, "", "  ")
-	p.API.LogInfo(string(b))
-
 	p.grumbleServer.RemoveChannel(channel)
+	p.grumbleServer.BroadcastChannels()
+
 	w.WriteHeader(204)
 	fmt.Fprintf(w, "Channel Deleted")
 }
