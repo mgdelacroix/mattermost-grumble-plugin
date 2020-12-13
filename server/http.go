@@ -10,6 +10,11 @@ import (
 
 type Params map[string]interface{}
 
+type ResponseChannel struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+}
+
 func DecodeParams(r *http.Request) *Params {
 	p := &Params{}
 	json.NewDecoder(r.Body).Decode(&p)
@@ -31,8 +36,10 @@ func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Req
 	switch {
 	case (url == "/" || url == "") && r.Method == "GET":
 		p.rootHandler(w, r)
-	case url == "/create" && r.Method == "POST":
+	case url == "/channels" && r.Method == "POST":
 		p.createChannelHandler(w, r)
+	case url == "/channels" && r.Method == "GET":
+		p.listChannelsHandler(w, r)
 	case url == "/remove" && r.Method == "DELETE":
 		p.removeChannelHandler(w, r)
 	default:
@@ -57,7 +64,16 @@ func (p *Plugin) createChannelHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(201)
 	w.Header().Add("Content-Type", "application/json")
-	fmt.Fprintf(w, JSON(c))
+	fmt.Fprintf(w, JSON(&ResponseChannel{Id: c.Id, Name: c.Name}))
+}
+
+func (p *Plugin) listChannelsHandler(w http.ResponseWriter, r *http.Request) {
+	channels := make([]*ResponseChannel, len(p.grumbleServer.Channels))
+	for i, channel := range p.grumbleServer.Channels {
+		channels[i] = &ResponseChannel{Id: channel.Id, Name: channel.Name}
+	}
+
+	fmt.Fprintf(w, JSON(channels))
 }
 
 func (p *Plugin) removeChannelHandler(w http.ResponseWriter, r *http.Request) {
