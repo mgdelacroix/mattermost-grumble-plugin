@@ -1,10 +1,10 @@
 export type Channel = {
-    id: string;
+    id: number;
     name: string;
 }
 
 export type User = {
-    id: string;
+    id: number;
     name: string;
     avatarUrl: string;
     selfMute: boolean;
