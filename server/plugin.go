@@ -183,6 +183,13 @@ func (p *Plugin) Unfreeze(fs *freezer.Server) error {
 	}
 	p.grumbleServer.UnfreezeChannels(fs)
 
+	rootC := p.grumbleServer.RootChannel()
+	for _, c := range p.grumbleServer.Channels {
+		if c.Id != 0 {
+			rootC.AddChild(c)
+		}
+	}
+
 	return nil
 }
 
