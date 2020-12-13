@@ -73,7 +73,7 @@ func (p *Plugin) createChannelHandler(w http.ResponseWriter, r *http.Request) {
 
 func (p *Plugin) listChannelsHandler(w http.ResponseWriter, r *http.Request) {
 	channels := []*ResponseChannel{}
-	for _, channel := range p.grumbleServer.Channels {
+	for _, channel := range p.grumbleServer.RootChannel().AllSubChannels() {
 		channels = append(channels, &ResponseChannel{Id: channel.Id, Name: channel.Name})
 	}
 
