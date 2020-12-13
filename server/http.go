@@ -30,24 +30,36 @@ func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Req
 	url := r.URL.String()
 	switch {
 	case (url == "/" || url == "") && r.Method == "GET":
-		fmt.Fprintf(w, "ROOT")
+		p.rootHandler(w, r)
 	case url == "/create" && r.Method == "POST":
-		params := DecodeParams(r)
-		name := params.String("name")
-
-		if name == "" {
-			http.Error(w, "Invalid parameter \"name\"", http.StatusBadRequest)
-			return
-		}
-
-		c := p.grumbleServer.AddChannel(params.String("name"))
-
-		w.WriteHeader(201)
-		w.Header().Add("Content-Type", "application/json")
-		fmt.Fprintf(w, JSON(c))
+		p.createChannelHandler(w, r)
 	case url == "/remove" && r.Method == "DELETE":
-		fmt.Fprintf(w, "DELETE")
+		p.removeChannelHandler(w, r)
 	default:
 		http.NotFound(w, r)
 	}
+}
+
+func (p *Plugin) rootHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "ROOT")
+}
+
+func (p *Plugin) createChannelHandler(w http.ResponseWriter, r *http.Request) {
+	params := DecodeParams(r)
+	name := params.String("name")
+
+	if name == "" {
+		http.Error(w, "Invalid parameter \"name\"", http.StatusBadRequest)
+		return
+	}
+
+	c := p.grumbleServer.AddChannel(params.String("name"))
+
+	w.WriteHeader(201)
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, JSON(c))
+}
+
+func (p *Plugin) removeChannelHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "DELETE")
 }
