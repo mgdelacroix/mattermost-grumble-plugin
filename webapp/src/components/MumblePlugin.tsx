@@ -6,6 +6,7 @@ import {Channel, User} from '../types';
 
 import ChannelList from './ChannelList';
 import MumbleControlBar from './MumbleControlBar';
+import {deleteChannel, createChannel} from '../client'
 import './MumblePlugin.scss';
 
 import {VADVoiceHandler, ContinuousVoiceHandler, initVoice} from '../voice';
@@ -219,7 +220,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         });
     }
 
-    private handleNewChannelKey = (e: React.KeyboardEvent): void => {
+    private handleNewChannelKey = async (e: React.KeyboardEvent): Promise<void> => {
         const ESC = 27;
         const ENTER = 13;
         if (e.keyCode === ESC) {
@@ -227,11 +228,18 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
             e.preventDefault();
         }
         if (e.keyCode === ENTER) {
-            // TODO: Create the new channel using the API
-            console.log('Creating new channel:', this.state.newChannelName);
-            this.setState({newChannelName: '', addingChannel: false});
-            e.preventDefault();
+            try {
+                await createChannel(this.state.newChannelName)
+                this.setState({newChannelName: '', addingChannel: false});
+                e.preventDefault();
+            } catch (e) {
+                e.preventDefault();
+            }
         }
+    }
+
+    private handleChannelDelete = (id: number): void => {
+        deleteChannel(id);
     }
 
     public render(): JSX.Element {
@@ -274,6 +282,8 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
                                 activeChannel={this.state.activeChannel}
                                 activeChannelUsers={this.state.activeChannelUsers}
                                 speakingUsers={this.state.speakingUsers}
+                                channelDelete={this.handleChannelDelete}
+                                isAdmin={currentUser.roles.indexOf('system_admin') !== -1}
                             />
                             <MumbleControlBar
                                 channel={this.state.activeChannel}

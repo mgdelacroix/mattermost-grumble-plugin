@@ -1,6 +1,7 @@
 .voicechat-channel-list {
   color: rgba(var(--sidebar-text-rgb), 0.6);
   padding-left: 15px;
+  padding-right: 15px;
 
   li {
       list-style-type: none;
@@ -13,10 +14,31 @@
     text-align: left;
     background: transparent;
     border: 0px;
+    display: flex;
+    align-items: center;
+    height: 43px;
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
+      .voicechat-channel-delete-button {
+        display: block;
+      }
     }
+  }
+
+  .voicechat-channel-name {
+      flex-grow: 1;
+  }
+
+  .voicechat-channel-delete-button {
+      display: none;
+      padding: 0;
+      color: rgba(var(--sidebar-text-rgb), 0.6);
+      text-align: left;
+      background: transparent;
+      border: 0px;
+      width: unset;
+      font-size: 20px;
   }
 
   svg {
