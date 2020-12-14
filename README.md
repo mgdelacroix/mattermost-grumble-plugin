@@ -3,6 +3,8 @@
 This plugin enables voice chat over an embedded Mumble server and
 HTML5 client.
 
+![](./mattermost-grumble-plugin.png)
+
 ## API
 
 The base URL of the plugin is
