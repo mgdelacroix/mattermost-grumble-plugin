@@ -1,6 +1,7 @@
 export type Channel = {
     id: number;
     name: string;
+    membersCount: number;
 }
 
 export type User = {

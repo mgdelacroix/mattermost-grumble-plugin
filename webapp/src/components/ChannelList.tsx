@@ -24,10 +24,12 @@ const ChannelList: React.FC<Props> = ({channels, setActiveVoiceChannel, activeCh
             {channels.map(({
                 id,
                 name,
+                membersCount,
             }): JSX.Element => (
                 <li key={id}>
                     <button onClick={(): void => setActiveVoiceChannel({id, name})}>
                         <FiVolume2 size={16}/>
+                        <span className='voicechat-members-count'>{membersCount}</span>
                         <span className='voicechat-channel-name'>{name}</span>
                         {isAdmin &&
                             <button

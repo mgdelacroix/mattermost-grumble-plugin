@@ -91,7 +91,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         if (channel) {
             this.setState({
                 channels: this.client.channels.reduce((acc: {[key: string]: {id: string, name: string}}, chan: any): {[key: string]: {id: string, name: string}} => {
-                    acc[chan._id] = {id: chan._id, name: chan.name};
+                    acc[chan._id] = {id: chan._id, name: chan.name, membersCount: chan.users.length};
                     return acc;
                 }, {}),
                 activeChannel: {id: channel._id, name: channel._name},
@@ -248,7 +248,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
             const rootChannel = this.client.root;
             this.setState({
                 channels: this.client.channels.reduce((acc: {[key: string]: {id: string, name: string}}, chan: any): {[key: string]: {id: string, name: string}} => {
-                    acc[chan._id] = {id: chan._id, name: chan.name};
+                    acc[chan._id] = {id: chan._id, name: chan.name, membersCount: chan.users.length};
                     return acc;
                 }, {}),
                 activeChannel: {id: rootChannel._id, name: rootChannel._name},

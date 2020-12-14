@@ -30,6 +30,20 @@
       flex-grow: 1;
   }
 
+  .voicechat-members-count {
+      background: rgba(255, 255, 255, 0.16);
+      color: rgba(var(--sidebar-text-rgb), 0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
+      font-size: 11px;
+      font-weight: 700;
+  }
+
   .voicechat-channel-delete-button {
       display: none;
       padding: 0;
@@ -39,11 +53,14 @@
       border: 0px;
       width: unset;
       font-size: 20px;
+      &:hover {
+          background: transparent;
+      }
   }
 
   svg {
     stroke: –sidebar-text;
-    margin-right: 8px;
+    margin-right: 4px;
   }
 
   &__users {
