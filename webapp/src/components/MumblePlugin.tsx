@@ -225,27 +225,27 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
             }
 
 
-            // this.client = await mumbleClient(`wss://${location.hostname}:8090`, {
-            //     username: `${currentUser.username} mmid:${currentUser.id}`,
-            //     password: '',
-            //     webrtc: {
-            //         enabled: true,
-            //         required: true,
-            //         mic: this._delayedMicNode.stream,
-            //         audioContext: ctx,
-            //     },
-            //     tokens: [],
-            // });
- 
-            this.webWorkerConnector.setSampleRate(ctx.sampleRate)
-            this.client = await this.webWorkerConnector.connect(`wss://${location.hostname}:8090`, {
+            this.client = await mumbleClient(`ws://${location.hostname}:64737`, {
                 username: `${currentUser.username} mmid:${currentUser.id}`,
                 password: '',
                 webrtc: {
-                    enabled: false,
+                    enabled: true,
+                    required: true,
+                    mic: this._delayedMicNode.stream,
+                    audioContext: ctx,
                 },
                 tokens: [],
             });
+ 
+            // this.webWorkerConnector.setSampleRate(ctx.sampleRate)
+            // this.client = await this.webWorkerConnector.connect(`wss://${location.hostname}:8090`, {
+            //     username: `${currentUser.username} mmid:${currentUser.id}`,
+            //     password: '',
+            //     webrtc: {
+            //         enabled: false,
+            //     },
+            //     tokens: [],
+            // });
             const rootChannel = this.client.root;
             this.setState({
                 channels: this.client.channels.reduce((acc: {[key: string]: {id: string, name: string}}, chan: any): {[key: string]: {id: string, name: string}} => {
