@@ -111,6 +111,10 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
                 this.updateUsers();
                 this.updateChannels();
             });
+            user.on('remove', (): void => {
+                this.updateUsers();
+                this.updateChannels();
+            });
         });
 
         this.client.channels.forEach((channel: any): void => {
@@ -132,6 +136,10 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
                 });
             });
             user.on('update', (): void => {
+                this.updateUsers();
+                this.updateChannels();
+            });
+            user.on('remove', (): void => {
                 this.updateUsers();
                 this.updateChannels();
             });
