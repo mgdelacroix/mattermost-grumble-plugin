@@ -275,7 +275,12 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
     }
 
     private handleToggleMic = (): void => {
-        this.client.setSelfMute(!this.state.mute);
+        if (this.state.mute) {
+            this.client.setSelfMute(false);
+        } else {
+            this.client.setSelfDeaf(!this.state.deafed);
+            this.client.setSelfDeaf(this.state.deafed);
+        }
         this.setState({mute: !this.state.mute});
     }
 
