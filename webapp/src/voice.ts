@@ -5,7 +5,7 @@ import keyboardjs from 'keyboardjs'
 import vad from 'voice-activity-detection'
 import DropStream from 'drop-stream'
 
-class VoiceHandler extends Writable {
+export class VoiceHandler extends Writable {
     constructor (client, settings) {
         super({objectMode: true});
         this._client = client;
@@ -156,12 +156,13 @@ export class VADVoiceHandler extends VoiceHandler {
     }
 }
 
-var theUserMedia = null
+var theUserMedia: MediaStream | null = null;
 
-export function initVoice(onData: (data: any) => void): MediaStream {
-    return window.navigator.mediaDevices.getUserMedia({audio: true}).then((userMedia) => {
+export function initVoice(onData: (data: any) => void): Promise<MediaStream> {
+    return window.navigator.mediaDevices.getUserMedia({audio: true}).then((userMedia: MediaStream): MediaStream => {
         theUserMedia = userMedia;
-        var micStream = new MicrophoneStream(userMedia, {objectMode: true, bufferSize: 1024});
+        const BufferSize = 1024;
+        var micStream = new MicrophoneStream(userMedia, {objectMode: true, bufferSize: BufferSize});
         micStream.on('data', (data: any): void => {
             onData(Buffer.from(data.getChannelData(0).buffer));
         });

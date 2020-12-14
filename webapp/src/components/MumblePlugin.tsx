@@ -2,21 +2,19 @@ import React, {useState, useEffect} from 'react';
 
 import mumbleClient from 'mumble-client-websocket';
 import audioContext from 'audio-context'
-import WorkerBasedMumbleConnector from '../worker-client'
-
 
 import {Channel, User} from '../types';
+import {VADVoiceHandler, ContinuousVoiceHandler, PushToTalkVoiceHandler, VoiceHandler, initVoice} from '../voice';
+import {deleteChannel, createChannel} from '../client'
 
 import ChannelList from './ChannelList';
 import MumbleControlBar from './MumbleControlBar';
-import {deleteChannel, createChannel} from '../client'
+
 import './MumblePlugin.scss';
 
-import {VADVoiceHandler, ContinuousVoiceHandler, PushToTalkVoiceHandler, VoiceHandler, initVoice} from '../voice';
 let voiceHandler: VoiceHandler;
 
 const getUserMedia = (): Promise<MediaStream> => {
-    //const voiceHandler = new VADVoiceHandler(client, {vadLevel: 0.3});
     return initVoice((data: any): void => {
         if (voiceHandler) {
             voiceHandler.write(data);
@@ -43,9 +41,8 @@ type State = {
 };
 
 export default class MumblePlugin extends React.PureComponent<Props, State> {
-    private client: any = null;
+    private client: mumbleClient = null;
     private inputRef = React.createRef<HTMLInputElement>();
-    private webWorkerConnector = new WorkerBasedMumbleConnector();
 
     public constructor(props: Props) {
         super(props);
@@ -57,6 +54,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
             mute: false,
             deafed: false,
             connected: false,
+            connecting: false,
             connectError: '',
             addingChannel: false,
             newChannelName: '',
@@ -67,10 +65,9 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         const channel = this.client.getChannelById(this.state.activeChannel ? this.state.activeChannel.id : this.client.root._id)
         if (channel) {
             this.setState({
-                activeChannelUsers: channel.users.map((u) => ({
+                activeChannelUsers: channel.users.map((u: any): User => ({
                     id: u._id,
                     name: u._username.split(' mmid:')[0],
-                    active: false,
                     avatarUrl: u._username.split(' mmid:')[1] ? `/api/v4/users/${u._username.split(' mmid:')[1]}/image?_=0` : '',
                     selfDeaf: u._selfDeaf,
                     selfMute: u._selfMute,
@@ -106,7 +103,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         this.client.users.forEach((user: any): void => {
             user.on('voice', (stream: any): void => {
                 this.setState({speakingUsers: {...this.state.speakingUsers, [user._id]: true}});
-                stream.on('data', () => {}).on('end', (): void => {
+                stream.on('data', (): void => {}).on('end', (): void => {
                     this.setState({speakingUsers: {...this.state.speakingUsers, [user._id]: false}});
                 });
             });
@@ -185,15 +182,18 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
         }
         voiceHandler.on('started_talking', (): void => {
             if (this.client.self) {
-                this.client.self.talking('on')
+                console.log('talking');
+                this.setState({speakingUsers: {...this.state.speakingUsers, [this.client.self._id]: true}});
             }
         })
         voiceHandler.on('stopped_talking', (): void => {
             if (this.client.self) {
-                this.client.self.talking('off')
+                console.log('not talking');
+                this.setState({speakingUsers: {...this.state.speakingUsers, [this.client.self._id]: false}});
             }
         })
-        if (this.client.self.selfMute) {
+
+        if (this.client.self._selfMute) {
             voiceHandler.setMute(true)
         }
    
@@ -213,7 +213,7 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
     private connect = async (): void => {
         this.setState({connecting: true});
         const ctx = audioContext();
-        // try {
+        try {
             const currentUser = this.props.getCurrentUser();
             const userMedia = await getUserMedia();
 
@@ -223,7 +223,6 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
                 this._delayNode.delayTime.value = 0.15
                 this._delayedMicNode = ctx.createMediaStreamDestination()
             }
-
 
             this.client = await mumbleClient(`ws://${location.hostname}:64737`, {
                 username: `${currentUser.username} mmid:${currentUser.id}`,
@@ -261,13 +260,13 @@ export default class MumblePlugin extends React.PureComponent<Props, State> {
             this.updateVoiceHandler();
             this.handleClientEvents();
 
-        // } catch (e) {
-        //     this.setState({
-        //         connected: false,
-        //         connecting: false,
-        //         connectError: 'Unable to connect to the mumble server',
-        //     });
-        // }
+        } catch (e) {
+            this.setState({
+                connected: false,
+                connecting: false,
+                connectError: 'Unable to connect to the mumble server',
+            });
+        }
     }
 
     private handleToggleAudio = (): void => {
